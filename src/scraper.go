@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/csv"
+	"fmt"
 	"log"
 	"os"
 	"path/filepath"
@@ -34,7 +35,22 @@ func main() {
 
 	//collector
 	c := colly.NewCollector(
-		colly.AllowedDomains("olx.ro"),
+		colly.AllowedDomains("https://www.olx.ro/"),
 	)
+
+	//HTML parser
+	c.OnHTML(".css-1fp4ipz", func(e *colly.HTMLElement) { //div class that contains wanted info
+
+		writer.Write([]string{
+			e.ChildText("h4"), //specific tag of the info
+			//e.ChildText("span"),
+		})
+	})
+
+	fmt.Printf("Scraping page :  ")
+	c.Visit("https://www.olx.ro/d/oferta/bmw-xdrixe-seria-7-2020-71000-tva-IDgp7iN.html")
+
+	log.Printf("\n\nScraping Complete\n\n")
+	log.Println(c)
 
 }
