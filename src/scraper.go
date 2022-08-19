@@ -10,7 +10,7 @@ import (
 	"github.com/gocolly/colly"
 )
 
-/*func destFile(x string) (f os.File){
+/*func destFile(x string) (f os.File) {
 	fName := filepath.Join("D:\\", "go projects", "cwst go", "CWST-GO", "target folder", x)
 	file, err := os.Create(fName)
 	if err != nil {
@@ -18,6 +18,18 @@ import (
 	}
 	defer file.Close()
 	return *file
+}
+
+func getSellerName(x string) (y string) {
+	var z string
+	c := colly.NewCollector(
+		colly.AllowedDomains("www.olx.ro"),
+	)
+	c.OnHTML(".css-1fp4ipz", func(e *colly.HTMLElement) {
+		z = e.ChildText("h4")
+	})
+	c.Visit(x)
+	return z
 }*/
 
 func main() {

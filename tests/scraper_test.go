@@ -7,3 +7,9 @@ func TestDestFile(t *testing.T) {
 		t.Error("destination file could not be created successfully")
 	}
 }
+
+func TestGetSellerName(t *testing.T) {
+	if getSellerName("https://www.olx.ro/d/oferta/bmw-xdrixe-seria-7-2020-71000-tva-IDgp7iN.html") == nil {
+		t.Error("could not get seller name")
+	}
+}
