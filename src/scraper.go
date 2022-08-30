@@ -10,7 +10,8 @@ import (
 	"github.com/gocolly/colly"
 )
 
-/*func destFile(x string) (f os.File) {
+/*
+func destFile(x string) (f os.File) {
 	fName := filepath.Join("D:\\", "go projects", "cwst go", "CWST-GO", "target folder", x)
 	file, err := os.Create(fName)
 	if err != nil {
@@ -30,7 +31,32 @@ func getSellerName(x string) (y string) {
 	})
 	c.Visit(x)
 	return z
-}*/
+}
+
+func getDateOfPost(x string) (y string) {
+	var z string
+	c := colly.NewCollector(
+		colly.AllowedDomains("www.olx.ro"),
+	)
+	c.OnHTML(".css-ubdo89-Text", func(e *colly.HTMLElement) {
+		e.ChildText("span")
+	})
+	c.Visit(x)
+	return z
+}
+
+func getItemTitle(x string) (y string) {
+	var z string
+	c := colly.NewCollector(
+		colly.AllowedDomains("www.olx.ro"),
+	)
+	c.OnHTML(".css-sg1fy9", func(e *colly.HTMLElement) {
+		e.ChildText("h1")
+	})
+	c.Visit(x)
+	return z
+}
+*/
 
 func main() {
 	//setting up the file where we store collected data
@@ -55,8 +81,8 @@ func main() {
 		colly.AllowedDomains("www.olx.ro"),
 	)
 
-	//HTML parser
-	c.OnHTML(".css-1fp4ipz", func(e *colly.HTMLElement) { //div class that contains wanted info
+	//HTML parser for seller name
+	c.OnHTML(".css-1fp4ipz", func(e *colly.HTMLElement) { //class that contains wanted info
 
 		//y <- e.ChildText("h4")
 
@@ -71,15 +97,27 @@ func main() {
 		})
 	})
 
+	//HTML parser for the date on which the item was posted online
+	c.OnHTML(".css-ubdo89-Text", func(e *colly.HTMLElement) { //class that contains wanted info
+		writer.Write([]string{
+			e.ChildText("span"), //specific tag of the info
+		})
+	})
+
+	//HTML parser for item title
+	c.OnHTML(".css-sg1fy9", func(e *colly.HTMLElement) { //class that contains wanted info
+		writer.Write([]string{
+			e.ChildText("h1"), //specific tag of the info
+		})
+	})
+
 	//visiting 4 target pages
 	fmt.Printf("Scraping page 1 ... \n")
 	c.Visit("https://www.olx.ro/d/oferta/bmw-xdrixe-seria-7-2020-71000-tva-IDgp7iN.html")
-	fmt.Printf("Scraping page 2 ... \n")
+	/*fmt.Printf("Scraping page 2 ... \n")
 	c.Visit("https://www.olx.ro/d/oferta/televizor-smart-qled-samsung-75qn900a-189-cm-ultra-hd-8k-neo-qled-IDfR6sI.html")
 	fmt.Printf("Scraping page 3 ... \n")
-	c.Visit("https://www.olx.ro/d/oferta/vand-casa-in-gai-IDgpIH8.html")
-	fmt.Printf("Scraping page 4 ... \n")
-	c.Visit("https://www.olx.ro/d/oferta/suport-tac-biliard-din-2-bucati-IDgo4s9.html")
+	c.Visit("https://www.olx.ro/d/oferta/suport-tac-biliard-din-2-bucati-IDgo4s9.html")*/
 
 	log.Printf("\n\nScraping Complete\n\n")
 	log.Println(c)
