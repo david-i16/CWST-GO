@@ -39,7 +39,7 @@ func getDateOfPost(x string) (y string) {
 		colly.AllowedDomains("www.olx.ro"),
 	)
 	c.OnHTML(".css-ubdo89-Text", func(e *colly.HTMLElement) {
-		e.ChildText("span")
+		z = e.ChildText("span")
 	})
 	c.Visit(x)
 	return z
@@ -51,7 +51,31 @@ func getItemTitle(x string) (y string) {
 		colly.AllowedDomains("www.olx.ro"),
 	)
 	c.OnHTML(".css-sg1fy9", func(e *colly.HTMLElement) {
-		e.ChildText("h1")
+		z = e.ChildText("h1")
+	})
+	c.Visit(x)
+	return z
+}
+
+func getItemPrice(x string) (y string) {
+	var z string
+	c := colly.NewCollector(
+		colly.AllowedDomains("www.olx.ro"),
+	)
+	c.OnHTML(".css-dcwlyx", func(e *colly.HTMLElement) {
+		z = e.ChildText("h3")
+	})
+	c.Visit(x)
+	return z
+}
+
+func getItemDescription(x string) (y string) {
+	var z string
+	c := colly.NewCollector(
+		colly.AllowedDomains("www.olx.ro"),
+	)
+	c.OnHTML(".css-1m8mzwg", func(e *colly.HTMLElement) {
+		z = e.ChildText("div")
 	})
 	c.Visit(x)
 	return z
@@ -111,7 +135,21 @@ func main() {
 		})
 	})
 
-	//visiting 4 target pages
+	//HTML parser for item price
+	c.OnHTML(".css-dcwlyx", func(e *colly.HTMLElement) { //class that contains wanted info
+		writer.Write([]string{
+			e.ChildText("h3"), //specific tag of the info
+		})
+	})
+
+	//HTML parser for item description
+	c.OnHTML(".css-1m8mzwg", func(e *colly.HTMLElement) { //class that contains wanted info
+		writer.Write([]string{
+			e.ChildText("div"), //specific tag of the info
+		})
+	})
+
+	//visiting 3 target pages
 	fmt.Printf("Scraping page 1 ... \n")
 	c.Visit("https://www.olx.ro/d/oferta/bmw-xdrixe-seria-7-2020-71000-tva-IDgp7iN.html")
 	/*fmt.Printf("Scraping page 2 ... \n")

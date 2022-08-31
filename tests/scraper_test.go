@@ -20,8 +20,14 @@ func TestGetDateOfPost(t *testing.T) {
 	}
 }
 
-func TestGetItemTitle(t *testing.T) {
-	if getItemTitle("https://www.olx.ro/d/oferta/bmw-xdrixe-seria-7-2020-71000-tva-IDgp7iN.html") == nil {
-		t.Error("could not get item title")
+func TestGetItemPrice(t *testing.T) {
+	if getItemPrice("https://www.olx.ro/d/oferta/bmw-xdrixe-seria-7-2020-71000-tva-IDgp7iN.html") == nil {
+		t.Error("could not get item price")
+	}
+}
+
+func TestGetItemDescription(t *testing.T) {
+	if getItemDescription("https://www.olx.ro/d/oferta/bmw-xdrixe-seria-7-2020-71000-tva-IDgp7iN.html") == nil {
+		t.Error("could not get item description")
 	}
 }
