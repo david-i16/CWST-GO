@@ -1,9 +1,12 @@
 package main
 
 import (
+	"encoding/base64"
 	"encoding/csv"
 	"fmt"
+	"io/ioutil"
 	"log"
+	"net/http"
 	"os"
 	"path/filepath"
 
@@ -82,6 +85,38 @@ func getItemDescription(x string) (y string) {
 }
 */
 
+// functions for Base 64 image
+func toBase64(b []byte) string {
+	return base64.StdEncoding.EncodeToString(b)
+}
+
+func imgtoBase64(adr string) string {
+	resp, err := http.Get(adr)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	defer resp.Body.Close()
+
+	bytes, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	var base64Encoding string
+	mimeType := http.DetectContentType(bytes)
+
+	switch mimeType {
+	case "image/jpeg":
+		base64Encoding += "data:image/jpeg;base64,"
+	case "image/png":
+		base64Encoding += "data:image/png;base64,"
+	}
+
+	base64Encoding += toBase64(bytes)
+	return base64Encoding
+}
+
 func main() {
 	//setting up the file where we store collected data
 	fName := filepath.Join("D:\\", "go projects", "cwst go", "CWST-GO", "target folder", "index.csv")
@@ -149,9 +184,23 @@ func main() {
 		})
 	})
 
+	//HTML parser for location(not working)
+	c.OnHTML(".css-1nrl4q4 div", func(e *colly.HTMLElement) { //class that contains wanted info
+		writer.Write([]string{
+			e.ChildText("p"), //specific tag of the info
+		})
+	})
+
+	//base64 encoding for all images(only first accessed????)
+	c.OnHTML(".swiper-zoom-container img", func(e *colly.HTMLElement) { //class that contains wanted info
+		writer.Write([]string{
+			imgtoBase64(e.Attr("src")),
+		})
+	})
+
 	//visiting 3 target pages
 	fmt.Printf("Scraping page 1 ... \n")
-	c.Visit("https://www.olx.ro/d/oferta/bmw-xdrixe-seria-7-2020-71000-tva-IDgp7iN.html")
+	c.Visit("https://www.olx.ro/d/oferta/bmw-m-750-xi-garantie-5-ani-full-option-44000km-istoric-service-bmw-IDgqWYY.html")
 	/*fmt.Printf("Scraping page 2 ... \n")
 	c.Visit("https://www.olx.ro/d/oferta/televizor-smart-qled-samsung-75qn900a-189-cm-ultra-hd-8k-neo-qled-IDfR6sI.html")
 	fmt.Printf("Scraping page 3 ... \n")
