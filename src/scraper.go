@@ -184,19 +184,19 @@ func main() {
 		})
 	})
 
-	//HTML parser for location(not working)
-	c.OnHTML(".css-1nrl4q4 div", func(e *colly.HTMLElement) { //class that contains wanted info
+	//HTML parser for location(not working ¯\_(ツ)_/¯)
+	c.OnHTML(".qa-static-ad-map-container img", func(e *colly.HTMLElement) { //class that contains wanted info
 		writer.Write([]string{
-			e.ChildText("p"), //specific tag of the info
+			e.Attr("alt"),
 		})
 	})
 
 	//base64 encoding for all images(only first accessed????)
-	c.OnHTML(".swiper-zoom-container img", func(e *colly.HTMLElement) { //class that contains wanted info
+	/*c.OnHTML(".swiper-zoom-container img", func(e *colly.HTMLElement) { //class that contains wanted info
 		writer.Write([]string{
 			imgtoBase64(e.Attr("src")),
 		})
-	})
+	})*/
 
 	//visiting 3 target pages
 	fmt.Printf("Scraping page 1 ... \n")
