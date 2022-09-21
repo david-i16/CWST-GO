@@ -192,11 +192,11 @@ func main() {
 	})
 
 	//base64 encoding for all images(only first accessed????)
-	/*c.OnHTML(".swiper-zoom-container img", func(e *colly.HTMLElement) { //class that contains wanted info
+	c.OnHTML(".swiper-zoom-container img", func(e *colly.HTMLElement) { //class that contains wanted info
 		writer.Write([]string{
 			imgtoBase64(e.Attr("src")),
 		})
-	})*/
+	})
 
 	//visiting 3 target pages
 	fmt.Printf("Scraping page 1 ... \n")
