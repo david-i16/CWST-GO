@@ -4,17 +4,24 @@ import (
 	"encoding/base64"
 	"encoding/csv"
 	"fmt"
+	"image"
+	"image/jpeg"
+
 	"io/ioutil"
 	"log"
 	"net/http"
 	"os"
 	"path/filepath"
 	"strconv"
+	"strings"
 
 	"github.com/gocolly/colly"
 )
 
 var scrapedPageNum int
+var item_folder_name string
+var item_folder_name1 string
+var imageNum int
 
 func createDestFileAndWriter(name string) csv.Writer {
 	//setting up the file where we store collected data
@@ -137,6 +144,46 @@ func imgtoBase64(adr string) string {
 	return base64Encoding
 }
 
+func modelate_item_folder_name(x string) string {
+	t := strings.Replace(x, "Valabil din ", "", -1)
+	z := strings.ReplaceAll(t, " ", "_")
+	return z
+}
+
+func modelate_item_folder_name1(x string) string {
+	z := strings.ReplaceAll(x, ".", "_")
+	y := strings.ReplaceAll(z, ":", "_")
+	return y
+}
+
+func base64toJpg(data string) {
+
+	reader := base64.NewDecoder(base64.StdEncoding, strings.NewReader(data))
+	m, formatString, err := image.Decode(reader)
+	if err != nil {
+		log.Fatal(err)
+	}
+	bounds := m.Bounds()
+	fmt.Println("base64toJpg", bounds, formatString)
+
+	//Encode from image format to writer
+	imageNum++
+	pngFilename := "image_" + strconv.Itoa(imageNum) + ".jpg"
+
+	f, err := os.OpenFile(pngFilename, os.O_WRONLY|os.O_CREATE, 0777)
+	if err != nil {
+		log.Fatal(err)
+		return
+	}
+
+	err = jpeg.Encode(f, m, &jpeg.Options{Quality: 75})
+	if err != nil {
+		log.Fatal(err)
+		return
+	}
+	fmt.Println("Jpg file", pngFilename, "created")
+}
+
 func main() {
 	//setting up the file where we store collected data
 	fName := filepath.Join("D:\\", "go projects", "cwst go", "CWST-GO", "target folder", "index1.csv")
@@ -166,6 +213,7 @@ func main() {
 
 	//HTML parser for the date on which the item was posted online
 	c.OnHTML(".medium-7", func(e *colly.HTMLElement) { //class that contains wanted info
+		item_folder_name1 = "-" + e.ChildText("i")
 		writer.Write([]string{
 			e.ChildText("i"), //specific tag of the info
 		})
@@ -173,6 +221,7 @@ func main() {
 
 	//HTML parser for item title
 	c.OnHTML(".large-8", func(e *colly.HTMLElement) { //class that contains wanted info
+		item_folder_name = e.ChildText("h1")
 		writer.Write([]string{
 			e.ChildText("h1"), //specific tag of the info
 		})
@@ -202,21 +251,23 @@ func main() {
 
 	//base64 encoding for all images
 	c.OnHTML(".thumbZone img", func(e *colly.HTMLElement) { //class that contains wanted info
+		base64String := imgtoBase64(e.Attr("src"))
+		base64toJpg(base64String[strings.IndexByte(base64String, ',')+1:])
 		writer.Write([]string{
-			imgtoBase64(e.Attr("src")),
+			base64String,
 		})
 	})
 
 	//visiting 3 target pages
 	fmt.Printf("Scraping page 1 ... \n")
-	c.Visit("https://www.publi24.ro/anunturi/auto-moto/masini-second-hand/vw/golf/anunt/vw-golf-6-diesel-euro-5/8248h8271g4875fhd1d60789036fe1h7.html")
-	fmt.Printf("Scraping page 2 ... \n")
-	c.Visit("https://www.publi24.ro/anunturi/imobiliare/de-vanzare/case/vila/anunt/casa-individuala-cu-garaj-str-dumitru-mocanu/h0g0dg65hffi7467e6h1gg818hiid095.html")
-	fmt.Printf("Scraping page 3 ... \n")
 	c.Visit("https://www.publi24.ro/anunturi/auto-moto/utilaje/utilaje-agricole/alte-masini-agricole/anunt/grapa-cu-discuri-grano-system-de-la-2-7m/id59h447906g7e8gd91e64e53922i087.html")
-
 	log.Printf("\n\nScraping Complete\n\n")
 	log.Println(c)
+
+	item_folder_name = modelate_item_folder_name(item_folder_name + modelate_item_folder_name1(item_folder_name1))
+	if err := os.MkdirAll("TARGET FOLDER/"+item_folder_name, os.ModePerm); err != nil {
+		log.Fatal(err)
+	}
 
 	//scrape("https://www.publi24.ro/anunturi/auto-moto/masini-second-hand/vw/golf/anunt/vw-golf-6-diesel-euro-5/8248h8271g4875fhd1d60789036fe1h7.html")
 }
