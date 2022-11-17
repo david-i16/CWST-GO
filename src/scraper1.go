@@ -26,7 +26,7 @@ type ScrapeResult struct {
 	Itemprice       string
 	Itemdescription string
 	Location        string
-	Pictures        string
+	Pictures        []string
 }
 
 var scrapedPageNum int
@@ -39,6 +39,7 @@ var title string
 var price string
 var description string
 var location string
+var images []string
 
 /*func getItemLocation(website string) string {
 	var x string
@@ -198,6 +199,7 @@ func base64toJpg(data string) {
 	//Encode from image format to writer
 	imageNum++
 	pngFilename := "image_" + strconv.Itoa(imageNum) + ".jpg"
+	images[imageNum-1] = "image_" + strconv.Itoa(imageNum)
 
 	f, err := os.OpenFile(pngFilename, os.O_WRONLY|os.O_CREATE, 0777)
 	if err != nil {
@@ -307,7 +309,7 @@ func main() {
 
 	//scrape("https://www.publi24.ro/anunturi/auto-moto/masini-second-hand/vw/golf/anunt/vw-golf-6-diesel-euro-5/8248h8271g4875fhd1d60789036fe1h7.html")
 
-	pages := map[string]ScrapeResult{"page 1": {sellername, date, title, price, description, location, "image_1, image_2, image_3, image_4, image_5, image_6, image_7, image_8, image_9, image_10"}}
+	pages := map[string]ScrapeResult{"page 1": {sellername, date, title, price, description, location, images}}
 
 	data, err := yaml.Marshal(&pages)
 	if err != nil {
