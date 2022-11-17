@@ -16,12 +16,29 @@ import (
 	"strings"
 
 	"github.com/gocolly/colly"
+	"gopkg.in/yaml.v3"
 )
+
+type ScrapeResult struct {
+	Nameoftheseller string
+	Date            string
+	Itemtitle       string
+	Itemprice       string
+	Itemdescription string
+	Location        string
+	Pictures        string
+}
 
 var scrapedPageNum int
 var item_folder_name string
 var item_folder_name1 string
 var imageNum int
+var sellername string
+var date string
+var title string
+var price string
+var description string
+var location string
 
 /*func getItemLocation(website string) string {
 	var x string
@@ -218,6 +235,7 @@ func main() {
 
 	//HTML parser for seller name
 	c.OnHTML(".userdata h3", func(e *colly.HTMLElement) { //class that contains wanted info
+		sellername = e.ChildText("a")
 		writer.Write([]string{
 			e.ChildText("a"), //specific tag of the info
 		})
@@ -226,6 +244,7 @@ func main() {
 	//HTML parser for the date on which the item was posted online
 	c.OnHTML(".medium-7", func(e *colly.HTMLElement) { //class that contains wanted info
 		item_folder_name1 = "-" + e.ChildText("i")
+		date = e.ChildText("i")
 		writer.Write([]string{
 			e.ChildText("i"), //specific tag of the info
 		})
@@ -234,6 +253,7 @@ func main() {
 	//HTML parser for item title
 	c.OnHTML(".large-8", func(e *colly.HTMLElement) { //class that contains wanted info
 		item_folder_name = e.ChildText("h1")
+		title = e.ChildText("h1")
 		writer.Write([]string{
 			e.ChildText("h1"), //specific tag of the info
 		})
@@ -241,6 +261,7 @@ func main() {
 
 	//HTML parser for item price
 	c.OnHTML(".large-4", func(e *colly.HTMLElement) { //class that contains wanted info
+		price = e.ChildText("span")
 		writer.Write([]string{
 			e.ChildText("span"), //specific tag of the info
 		})
@@ -248,6 +269,8 @@ func main() {
 
 	//HTML parser for item description
 	c.OnHTML(".article-detail", func(e *colly.HTMLElement) { //class that contains wanted info
+		description = e.ChildText("a")
+		description = description + e.ChildText("span")
 		writer.Write([]string{
 			e.ChildText("a"),
 			e.ChildText("span"), //specific tag of the info
@@ -256,6 +279,7 @@ func main() {
 
 	//HTML parser for location
 	c.OnHTML(".medium-5", func(e *colly.HTMLElement) { //class that contains wanted info
+		location = e.ChildText("a")
 		writer.Write([]string{
 			e.ChildText("a"),
 		})
@@ -282,4 +306,16 @@ func main() {
 	}
 
 	//scrape("https://www.publi24.ro/anunturi/auto-moto/masini-second-hand/vw/golf/anunt/vw-golf-6-diesel-euro-5/8248h8271g4875fhd1d60789036fe1h7.html")
+
+	pages := map[string]ScrapeResult{"page 1": {sellername, date, title, price, description, location, "image_1, image_2, image_3, image_4, image_5, image_6, image_7, image_8, image_9, image_10"}}
+
+	data, err := yaml.Marshal(&pages)
+	if err != nil {
+		log.Fatal(err)
+	}
+	err2 := ioutil.WriteFile(filepath.Join("D:\\", "go projects", "cwst go", "CWST-GO", "target folder", "page_result.yaml"), data, 0)
+	if err2 != nil {
+		log.Fatal(err2)
+	}
+	fmt.Println("data written")
 }
