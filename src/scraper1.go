@@ -23,7 +23,19 @@ var item_folder_name string
 var item_folder_name1 string
 var imageNum int
 
-func createDestFileAndWriter(name string) csv.Writer {
+/*func getItemLocation(website string) string {
+	var x string
+	c := colly.NewCollector(
+		colly.AllowedDomains("www.publi24.ro"),
+	)
+	c.OnHTML(".medium-5", func(e *colly.HTMLElement) { //class that contains wanted info
+		x = e.ChildText("a")
+	})
+	c.Visit("https://www.publi24.ro/anunturi/auto-moto/utilaje/utilaje-agricole/alte-masini-agricole/anunt/grapa-cu-discuri-grano-system-de-la-2-7m/id59h447906g7e8gd91e64e53922i087.html")
+	return x
+}*/
+
+/*func createDestFileAndWriter(name string) csv.Writer {
 	//setting up the file where we store collected data
 	fName := filepath.Join("D:\\", "go projects", "cwst go", "CWST-GO", "target folder", name+".csv")
 	file, err := os.Create(fName)
@@ -110,7 +122,7 @@ func scrape(webSiteAddr string) {
 	cly.Visit(webSiteAddr)
 	log.Printf("\n\nScraping Page " + strconv.Itoa(scrapedPageNum) + " Complete\n\n")
 	log.Println(cly)
-}
+}*/
 
 // functions for Base 64 image
 func toBase64(b []byte) string {
